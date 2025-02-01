@@ -1,0 +1,21 @@
+{
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "outDir": "dist",
+    "jsx": "react-jsx",
+    "sourceMap": true,
+    "declaration": true,
+  },
+  "include": [
+      "src/**/*"
+  ],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "node_modules",
+    "dist",
+    "examples"
+  ]
+}
