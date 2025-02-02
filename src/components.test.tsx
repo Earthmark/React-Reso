@@ -31,9 +31,7 @@ test("Single boolean element can be updated.", () => {
     {
       taco: true,
     },
-    {
-      diff: (d) => propDiffs.push(d),
-    }
+    (p) => propDiffs.push(p)
   );
   expect(propDiffs).toMatchInlineSnapshot(`
 [
@@ -73,9 +71,7 @@ test("verify slot stringifies as expected", () => {
       persistent: true,
       scale: { x: 3, y: 3, z: 3 },
     },
-    {
-      diff: (d) => propDiffs.push(d),
-    }
+    (p) => propDiffs.push(p)
   );
   expect(propDiffs).toMatchInlineSnapshot(`
 [
@@ -163,9 +159,7 @@ it.each(
     (componentDefs as any)[name as any].updater(
       oldProps as any,
       newProps as any,
-      {
-        diff: (d: any) => src.push(d),
-      }
+      (p) => src.push(p)
     );
     expect(src).toStrictEqual(expected);
   }

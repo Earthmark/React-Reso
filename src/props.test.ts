@@ -17,7 +17,7 @@ type TestCaseInput<PropFactory> = [
 ];
 
 type TestCaseMap = Partial<{
-  [key in keyof typeof props]: TestCaseInput<typeof props[key]>[];
+  [key in keyof typeof props]: TestCaseInput<(typeof props)[key]>[];
 }>;
 
 const testCases: TestCaseMap = {
@@ -163,7 +163,7 @@ const testCases: TestCaseMap = {
     [undefined, true, "true"],
     [undefined, false, "false"],
     [true, false, "false"],
-  ]
+  ],
 };
 
 function testPropFactory<
@@ -174,23 +174,22 @@ function testPropFactory<
   factory: PropFactory,
   [oldValue, newValue, expected]: TestCaseInput<PropFactory>
 ) {
-  const diff: Omit<PropUpdate, "prop">[] = [];
-  factory.field().field(oldValue, newValue, {
-    diff: (d: Omit<PropUpdate, "prop">) => diff.push(d),
-  });
+  const diff: PropUpdate[] = [];
+  factory.field().field("msg", oldValue, newValue, (n) => diff.push(n));
   expect(diff[0]).toStrictEqual(
     expected === undefined
       ? undefined
       : {
           type: typeName,
           value: expected,
+          prop: "msg",
         }
   );
 }
- 
+
 test("Test case maps", () => {
   for (const cases in testCases) {
-    let caseList = testCases[cases as keyof typeof testCases]
+    let caseList = testCases[cases as keyof typeof testCases];
     if (caseList) {
       for (const testCase of caseList) {
         testPropFactory(

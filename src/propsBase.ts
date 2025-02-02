@@ -2,62 +2,6 @@ import { PropUpdate } from "./signal";
 import { FieldRef } from "./renderer";
 
 /**
- * The core business logic in a handler, this is normally used in conjunction with propDefinitionsToUpdaters.
- */
-export interface PropComponents<Input, Normalized = Input> {
-  normalize(value: Input, def?: Normalized): Normalized;
-  stringify(value: Normalized): string;
-  equals(a: Normalized, b: Normalized): boolean;
-}
-
-export interface ElementProp<Value> {
-  field: (
-    oldProp: Value | undefined,
-    newProp: Value | undefined,
-    update: {
-      diff(o: Omit<PropUpdate, "prop">): void;
-    }
-  ) => void;
-}
-
-export interface ElementRef<TypeName extends string> {
-  ref: (elementId: string, name: string) => FieldRef<TypeName>;
-}
-
-function createRefPropComponents<TypeName extends string>(): PropComponents<
-  FieldRef<TypeName>
-> {
-  return {
-    normalize: (value) => value,
-    stringify: (value) => `${value.elementId}.${value.name}`,
-    equals: (a, b) =>
-      a.elementId === b.elementId && a.name === b.name && a.type === b.type,
-  };
-}
-
-type RefBuilder<TypeName extends string> = () => ElementRef<TypeName>;
-
-type FieldBuilder<Input, Normalized> = (def?: Normalized) => ElementProp<Input>;
-
-type RefFieldBuilder<TypeName extends string, Input, Normalized> = (
-  def?: Normalized
-) => ElementRef<TypeName> & ElementProp<Input>;
-
-export interface ElementPropFactory<
-  TypeName extends string,
-  Input,
-  Normalized = Input
-> {
-  indirectRefProp: () => ElementPropFactory<
-    `IField<${TypeName}>`,
-    FieldRef<`IField<${TypeName}>`>
-  >;
-  ref: RefBuilder<TypeName>;
-  field: FieldBuilder<Input, Normalized>;
-  refField: RefFieldBuilder<TypeName, Input, Normalized>;
-}
-
-/**
  * A helper function that wraps the core parts of diffing a prop, calling them using a regular boilerplate.
  *
  * It is suggested to use this function to create a property differ, as it handles edge cases in an expected way.
@@ -68,75 +12,114 @@ export interface ElementPropFactory<
  * @returns An object if the value changed, containing the new value to assign the property to.
  * If the inner value is null, the value is being reset/undefined. If the wrapper is null, no change was made.
  */
-function diffProp<Input, Normalized>(
-  { equals, stringify, normalize }: PropComponents<Input, Normalized>,
-  def: Normalized | undefined,
-  oldProp: Input | undefined,
-  newProp: Input | undefined
-): { value: string | null } | null {
-  const n = newProp !== undefined ? normalize(newProp, def) : undefined;
-  const hasO = oldProp !== undefined;
-  const hasN = n !== undefined;
-  if ((hasO || hasN) && (!hasO || !hasN || !equals(normalize(oldProp), n))) {
-    return { value: hasN ? stringify(n) : null };
-  }
-  return null;
+function makeDiffer<Input, Normalized = Input>(
+  { equals, stringify, normalize }: DifferImpl<Input, Normalized>,
+  type: string,
+  def?: Normalized
+): PropDiffer<Input> {
+  return (propName, oldProp, newProp, submit) => {
+    const n = newProp !== undefined ? normalize(newProp, def) : undefined;
+    const hasO = oldProp !== undefined;
+    const hasN = n !== undefined;
+    if ((hasO || hasN) && (!hasO || !hasN || !equals(normalize(oldProp), n))) {
+      submit({ prop: propName, type, value: hasN ? stringify(n) : null });
+    }
+  };
 }
 
-function makeRefBuilder<TypeName extends string>(
+export interface DifferImpl<Input, Normalized = Input> {
+  normalize(value: Input, def?: Normalized): Normalized;
+  stringify(value: Normalized): string;
+  equals(a: Normalized, b: Normalized): boolean;
+}
+
+type PropDiffer<Input> = (
+  propName: string,
+  oldProp: Input | undefined,
+  newProp: Input | undefined,
+  submit: (update: PropUpdate) => void
+) => void;
+
+export interface RefProp<TypeName extends string> {
+  ref: (elementId: string, propName: string) => FieldRef<TypeName>;
+}
+
+export interface SetProp<Input> {
+  field: PropDiffer<Input>;
+}
+
+export type RefSetProp<TypeName extends string, Input> = RefProp<TypeName> &
+  SetProp<Input>;
+
+function makeRefProp<TypeName extends string>(
   type: TypeName
-): RefBuilder<TypeName> {
-  return () => ({
-    ref: (elementId, name) => ({
+): RefProp<TypeName> {
+  return {
+    ref: (elementId, propName) => ({
       elementId,
-      name,
+      propName,
       type,
     }),
-  });
+  };
 }
 
-function makeFieldBuilder<Input, Normalized>(
+function makeSetProp<Input, Normalized>(
+  differ: DifferImpl<Input, Normalized>,
   type: string,
-  definition: PropComponents<Input, Normalized>
-): FieldBuilder<Input, Normalized> {
-  return (def) => ({
-    field: (oldProp, newProp, delta) => {
-      const updater = diffProp(definition, def, oldProp, newProp);
-      if (updater !== null) {
-        delta.diff({
-          ...updater,
-          type,
-        });
-      }
-    },
-  });
+  def?: Normalized
+): SetProp<Input> {
+  return {
+    field: makeDiffer(differ, type, def),
+  };
 }
 
-function makeRefFieldBuilder<TypeName extends string, Input, Normalized>(
-  refBuilder: RefBuilder<TypeName>,
-  fieldBuilder: FieldBuilder<Input, Normalized>
-): RefFieldBuilder<TypeName, Input, Normalized> {
-  return (def) => ({
-    ...refBuilder(),
-    ...fieldBuilder(def),
-  });
+function refPropDiffer<TypeName extends string>(): SetProp<FieldRef<TypeName>> {
+  return {
+    field: makeDiffer(
+      {
+        normalize: (value) => value,
+        stringify: (value) => `${value.elementId}.${value.propName}`,
+        equals: (a, b) =>
+          a.elementId === b.elementId &&
+          a.propName === b.propName &&
+          a.type === b.type,
+      },
+      "ref"
+    ),
+  };
 }
 
-function elementPropComponentsToPropUpdater<
+export interface ElementPropFactory<
   TypeName extends string,
   Input,
-  Normalized
->(
+  Normalized = Input
+> {
+  indirectProp: () => ElementPropFactory<
+    `IField<${TypeName}>`,
+    FieldRef<`IField<${TypeName}>`>
+  >;
+  fluxProp: () => ElementPropFactory<
+    `INodeObjectOutput<${TypeName}>`,
+    FieldRef<`INodeObjectOutput<${TypeName}>`>
+  >;
+  ref: () => RefProp<TypeName>;
+  field: (def?: Normalized) => SetProp<Input>;
+  refField: (def?: Normalized) => RefSetProp<TypeName, Input>;
+}
+
+function makeElementPropFactory<TypeName extends string, Input, Normalized>(
   type: TypeName,
-  definition: PropComponents<Input, Normalized>
+  differ: DifferImpl<Input, Normalized>
 ): ElementPropFactory<TypeName, Input, Normalized> {
-  const ref = makeRefBuilder(type);
-  const field = makeFieldBuilder(type, definition);
   return {
-    indirectRefProp: () => createRefPropFactory(`IField<${type}>`),
-    ref,
-    field,
-    refField: makeRefFieldBuilder(ref, field),
+    indirectProp: () => makeElementRefFactory(`IField<${type}>`),
+    fluxProp: () => makeElementRefFactory(`INodeObjectOutput<${type}>`),
+    ref: () => makeRefProp(type),
+    field: (def) => makeSetProp(differ, type, def),
+    refField: (def) => ({
+      ...makeRefProp(type),
+      ...makeSetProp(differ, type, def),
+    }),
   };
 }
 
@@ -145,27 +128,34 @@ export type ElementRefFactory<TypeName extends string> = ElementPropFactory<
   FieldRef<TypeName>
 >;
 
-const refPropComponents = createRefPropComponents();
-
-export function createRefPropFactory<TypeName extends string>(
+export function makeElementRefFactory<TypeName extends string>(
   type: TypeName
 ): ElementRefFactory<TypeName> {
-  const ref = makeRefBuilder(type);
-  const field = makeFieldBuilder("ref", refPropComponents);
   return {
-    indirectRefProp: () => createRefPropFactory(`IField<${type}>`),
-    ref,
-    field,
-    refField: makeRefFieldBuilder(ref, field),
+    indirectProp: () => makeElementRefFactory(`IField<${type}>` as const),
+    fluxProp: () => makeElementRefFactory(`INodeObjectOutput<${type}>` as const),
+    ref: () => makeRefProp(type),
+    field: () => refPropDiffer<TypeName>(),
+    refField: () => ({
+      ...makeRefProp(type),
+      ...refPropDiffer<TypeName>(),
+    }),
   };
 }
 
-type FactoryForComponent<
+type DifferImplToPropFactory<
   TypeName extends string,
-  Components
-> = Components extends PropComponents<infer Input, infer Normalized>
-  ? ElementPropFactory<TypeName, Input, Normalized>
+  Differ
+> = Differ extends DifferImpl<infer Input, infer Normalize>
+  ? ElementPropFactory<TypeName, Input, Normalize>
   : never;
+
+type ComponentElementPropFactories<TypeDiffers> = {
+  [PropType in Extract<keyof TypeDiffers, string>]: DifferImplToPropFactory<
+    PropType,
+    TypeDiffers[PropType]
+  >;
+};
 
 /**
  * A helper function for defining a large set of props at once, instead of defining them one by one.
@@ -173,55 +163,31 @@ type FactoryForComponent<
  * @returns An object keyed by the input, where each value is an assembled prop differ.
  */
 export function propComponentsToPropFactories<
-  FactoryComponents extends {
-    [Prop in keyof FactoryComponents]: PropComponents<unknown, unknown>;
-  }
+  FactoryComponents extends Record<string, DifferImpl<unknown, unknown>>
 >(
   propBases: FactoryComponents
-): {
-  [PropType in Extract<keyof FactoryComponents, string>]: FactoryForComponent<
-    PropType,
-    FactoryComponents[PropType]
-  >;
-} {
-  const result: Partial<{
-    [PropType in Extract<keyof FactoryComponents, string>]: FactoryForComponent<
-      PropType,
-      FactoryComponents[PropType]
-    >;
-  }> = {};
+): ComponentElementPropFactories<FactoryComponents> {
+  const result = {} as ComponentElementPropFactories<FactoryComponents>;
   for (const key in propBases) {
-    result[key] = elementPropComponentsToPropUpdater(
-      key,
-      propBases[key]
-    ) as any;
+    Object.assign(result, {
+      [key]: makeElementPropFactory(key, propBases[key]),
+    });
   }
-  return result as {
-    [PropType in Extract<keyof FactoryComponents, string>]: FactoryForComponent<
-      PropType,
-      FactoryComponents[PropType]
-    >;
-  };
+  return result;
 }
 
+type ComponentsToRefFactories<TypeDiffers extends Record<string, string>> = {
+  [PropType in keyof TypeDiffers]: ElementRefFactory<TypeDiffers[PropType]>;
+};
+
 export function refComponentsToRefFactories<
-  RefComponents extends {
-    [Ref in keyof RefComponents]: Extract<any, string>;
-  }
->(
-  refs: RefComponents
-): {
-  [RefType in Extract<keyof RefComponents, string>]: ElementRefFactory<
-    RefComponents[RefType]
-  >;
-} {
-  const result: Partial<{
-    [RefType in keyof RefComponents]: ElementRefFactory<RefComponents[RefType]>;
-  }> = {};
+  RefComponents extends Record<string, string>
+>(refs: RefComponents): ComponentsToRefFactories<RefComponents> {
+  const result = {} as ComponentsToRefFactories<RefComponents>;
   for (const key in refs) {
-    result[key] = createRefPropFactory(refs[key]);
+    Object.assign(result, {
+      [key]: makeElementRefFactory(refs[key]),
+    });
   }
-  return result as {
-    [RefType in keyof RefComponents]: ElementRefFactory<RefComponents[RefType]>;
-  };
+  return result;
 }

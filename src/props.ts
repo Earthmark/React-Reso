@@ -1,16 +1,16 @@
 import {
-  PropComponents,
+  DifferImpl,
   propComponentsToPropFactories,
   refComponentsToRefFactories,
 } from "./propsBase";
 
-const int: PropComponents<number, number> = {
+const int: DifferImpl<number, number> = {
   normalize: (value) => Math.floor(value),
   stringify: (value) => value.toString(10),
   equals: (a, b) => a === b,
 };
 
-const float: PropComponents<number, number> = {
+const float: DifferImpl<number, number> = {
   normalize: (value) => value,
   stringify: (value) => value.toString(10),
   equals: (a, b) => a === b,
@@ -22,9 +22,9 @@ export interface V2<Value> {
 }
 
 function v2<CompInput, CompNormalized>(
-  d: PropComponents<CompInput, CompNormalized>,
+  d: DifferImpl<CompInput, CompNormalized>,
   def: V2<CompNormalized>
-): PropComponents<Partial<V2<CompInput>>, V2<CompNormalized>> {
+): DifferImpl<Partial<V2<CompInput>>, V2<CompNormalized>> {
   return {
     normalize: (value, oDef) => ({
       x: value.x !== undefined ? d.normalize(value.x) : oDef?.x ?? def.x,
@@ -42,9 +42,9 @@ export interface V3<Value> {
 }
 
 function v3<CompInput, CompNormalized>(
-  d: PropComponents<CompInput, CompNormalized>,
+  d: DifferImpl<CompInput, CompNormalized>,
   def: V3<CompNormalized>
-): PropComponents<Partial<V3<CompInput>>, V3<CompNormalized>> {
+): DifferImpl<Partial<V3<CompInput>>, V3<CompNormalized>> {
   return {
     normalize: (value, oDef) => ({
       x: value.x !== undefined ? d.normalize(value.x) : oDef?.x ?? def.x,
@@ -68,9 +68,9 @@ export interface V4<Value> {
 }
 
 function v4<CompInput, CompNormalized>(
-  d: PropComponents<CompInput, CompNormalized>,
+  d: DifferImpl<CompInput, CompNormalized>,
   def: V4<CompNormalized>
-): PropComponents<Partial<V4<CompInput>>, V4<CompNormalized>> {
+): DifferImpl<Partial<V4<CompInput>>, V4<CompNormalized>> {
   return {
     normalize: (value, oDef) => ({
       x: value.x !== undefined ? d.normalize(value.x) : oDef?.x ?? def.x,
@@ -98,9 +98,9 @@ export interface C4<Value> {
 }
 
 function c4<CompInput, CompNormalized>(
-  d: PropComponents<CompInput, CompNormalized>,
+  d: DifferImpl<CompInput, CompNormalized>,
   def: C4<CompNormalized>
-): PropComponents<Partial<C4<CompInput>>, C4<CompNormalized>> {
+): DifferImpl<Partial<C4<CompInput>>, C4<CompNormalized>> {
   return {
     normalize: (value, oDef) => ({
       r: value.r !== undefined ? d.normalize(value.r) : oDef?.r ?? def.r,
@@ -133,7 +133,7 @@ const color = c4(float, { r: 0, g: 0, b: 0, a: 1 });
 const floatQ = v3(float, { x: 0, y: 0, z: 0 });
 
 type ColliderTypes = "NoCollision" | "Static" | "Trigger" | "StaticTrigger" | "StaticTriggerAuto" | "Active" | "HapticTrigger" | "HapticStaticTrigger" | "HapticStaticTriggerAuto" | "HapticSampler";
-const colliderType: PropComponents<ColliderTypes> = {
+const colliderType: DifferImpl<ColliderTypes> = {
   normalize: (value) => {
     if (value === undefined) {
       return "NoCollision";
@@ -145,7 +145,7 @@ const colliderType: PropComponents<ColliderTypes> = {
   equals: (a, b) => a === b,
 };
 
-const string: PropComponents<
+const string: DifferImpl<
   string | Array<string | undefined> | undefined,
   string
 > = {
@@ -163,9 +163,9 @@ const string: PropComponents<
   equals: (a, b) => a === b,
 };
 
-const bool: PropComponents<boolean, boolean> = {
+const bool: DifferImpl<boolean> = {
   normalize: (value) => value,
-  stringify: (value: boolean) => {
+  stringify: (value) => {
     return value ? "true" : "false";
   },
   equals: (a, b) => a === b,
@@ -187,11 +187,13 @@ export default {
     uri: string,
     bool,
     colliderType,
-  }),
+  } as const),
   ...refComponentsToRefFactories({
-    slot: "Slot" as "Slot",
-    material: "Material" as "Material",
-    iTexture2D: "ITexture2D" as "ITexture2D",
-    mesh: "Mesh" as "Mesh",
-  }),
+    slot: "Slot",
+    material: "Material",
+    iTexture2D: "ITexture2D",
+    mesh: "Mesh",
+    user: "User",
+    syncImpulse: "ISyncNodeOperation",
+  } as const),
 };
