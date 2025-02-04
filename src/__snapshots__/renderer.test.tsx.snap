@@ -1,23 +1,327 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Refs Interconnect 1`] = `[]`;
+exports[`Refs Interconnect 1`] = `
+[
+  {
+    "id": "1",
+    "signal": "create",
+    "type": "unlitMaterial",
+  },
+  {
+    "id": "1",
+    "props": [
+      {
+        "prop": "color",
+        "type": "color",
+        "value": "[1;0;1;1]",
+      },
+    ],
+    "signal": "update",
+  },
+  {
+    "id": "2",
+    "signal": "create",
+    "type": "meshRenderer",
+  },
+  {
+    "id": "3",
+    "signal": "create",
+    "type": "transform",
+  },
+  {
+    "id": "3",
+    "props": [
+      {
+        "prop": "position",
+        "type": "float3",
+        "value": "[2;4;19]",
+      },
+    ],
+    "signal": "update",
+  },
+  {
+    "id": "2",
+    "parentId": "3",
+    "signal": "setParent",
+  },
+  {
+    "id": "root",
+    "signal": "remove",
+  },
+  {
+    "id": "1",
+    "parentId": "root",
+    "signal": "setParent",
+  },
+  {
+    "id": "3",
+    "parentId": "root",
+    "signal": "setParent",
+  },
+  {
+    "id": "2",
+    "props": [
+      {
+        "prop": "material",
+        "type": "ref",
+        "value": "1.material",
+      },
+    ],
+    "signal": "update",
+  },
+]
+`;
 
-exports[`Verify hierarchy shows as expected 1`] = `[]`;
+exports[`Verify hierarchy shows as expected 1`] = `
+[
+  {
+    "id": "1",
+    "signal": "create",
+    "type": "text",
+  },
+  {
+    "id": "1",
+    "props": [
+      {
+        "prop": "children",
+        "type": "string",
+        "value": "This%20contains%20text!",
+      },
+    ],
+    "signal": "update",
+  },
+  {
+    "id": "2",
+    "signal": "create",
+    "type": "text",
+  },
+  {
+    "id": "2",
+    "props": [
+      {
+        "prop": "children",
+        "type": "string",
+        "value": "1",
+      },
+    ],
+    "signal": "update",
+  },
+  {
+    "id": "3",
+    "signal": "create",
+    "type": "canvas",
+  },
+  {
+    "id": "2",
+    "parentId": "3",
+    "signal": "setParent",
+  },
+  {
+    "id": "4",
+    "signal": "create",
+    "type": "transform",
+  },
+  {
+    "id": "4",
+    "props": [
+      {
+        "prop": "position",
+        "type": "float3",
+        "value": "[2;4;19]",
+      },
+    ],
+    "signal": "update",
+  },
+  {
+    "id": "1",
+    "parentId": "4",
+    "signal": "setParent",
+  },
+  {
+    "id": "3",
+    "parentId": "4",
+    "signal": "setParent",
+  },
+  {
+    "id": "5",
+    "signal": "create",
+    "type": "transform",
+  },
+  {
+    "id": "root",
+    "signal": "remove",
+  },
+  {
+    "id": "4",
+    "parentId": "root",
+    "signal": "setParent",
+  },
+  {
+    "id": "5",
+    "parentId": "root",
+    "signal": "setParent",
+  },
+]
+`;
 
-exports[`Verify hierarchy shows as expected 2`] = `[]`;
+exports[`Verify hierarchy shows as expected 2`] = `
+[
+  {
+    "id": "6",
+    "signal": "create",
+    "type": "boxMesh",
+  },
+  {
+    "after": "5",
+    "id": "6",
+    "parentId": "root",
+    "signal": "setParent",
+  },
+]
+`;
 
-exports[`Verify hierarchy shows as expected 3`] = `[]`;
+exports[`Verify hierarchy shows as expected 3`] = `
+[
+  {
+    "id": "6",
+    "signal": "remove",
+  },
+]
+`;
 
-exports[`Verify hierarchy shows as expected 4`] = `[]`;
+exports[`Verify hierarchy shows as expected 4`] = `
+[
+  {
+    "id": "2",
+    "props": [
+      {
+        "prop": "anchorMin",
+        "type": "float2",
+        "value": "[2;4]",
+      },
+    ],
+    "signal": "update",
+  },
+]
+`;
 
-exports[`Verify hierarchy shows as expected 5`] = `[]`;
+exports[`Verify hierarchy shows as expected 5`] = `
+[
+  {
+    "id": "2",
+    "props": [
+      {
+        "prop": "anchorMin",
+        "type": "float2",
+        "value": null,
+      },
+    ],
+    "signal": "update",
+  },
+]
+`;
 
-exports[`Verify hierarchy shows as expected 6`] = `[]`;
+exports[`Verify hierarchy shows as expected 6`] = `
+[
+  {
+    "id": "7",
+    "signal": "create",
+    "type": "text",
+  },
+  {
+    "id": "7",
+    "props": [
+      {
+        "prop": "children",
+        "type": "string",
+        "value": "2",
+      },
+    ],
+    "signal": "update",
+  },
+  {
+    "id": "8",
+    "signal": "create",
+    "type": "text",
+  },
+  {
+    "id": "8",
+    "props": [
+      {
+        "prop": "children",
+        "type": "string",
+        "value": "3",
+      },
+    ],
+    "signal": "update",
+  },
+  {
+    "id": "7",
+    "parentId": "3",
+    "signal": "setParent",
+  },
+  {
+    "id": "8",
+    "parentId": "3",
+    "signal": "setParent",
+  },
+]
+`;
 
-exports[`Verify hierarchy shows as expected 7`] = `[]`;
+exports[`Verify hierarchy shows as expected 7`] = `
+[
+  {
+    "id": "7",
+    "signal": "remove",
+  },
+]
+`;
 
-exports[`Verify hierarchy shows as expected 8`] = `[]`;
+exports[`Verify hierarchy shows as expected 8`] = `
+[
+  {
+    "id": "9",
+    "signal": "create",
+    "type": "text",
+  },
+  {
+    "id": "9",
+    "props": [
+      {
+        "prop": "children",
+        "type": "string",
+        "value": "2",
+      },
+    ],
+    "signal": "update",
+  },
+  {
+    "after": "8",
+    "id": "9",
+    "parentId": "3",
+    "signal": "setParent",
+  },
+]
+`;
 
-exports[`Verify hierarchy shows as expected 9`] = `[]`;
+exports[`Verify hierarchy shows as expected 9`] = `
+[
+  {
+    "id": "10",
+    "signal": "create",
+    "type": "boxMesh",
+  },
+  {
+    "id": "1",
+    "signal": "remove",
+  },
+  {
+    "after": "3",
+    "id": "10",
+    "parentId": "4",
+    "signal": "setParent",
+  },
+]
+`;
 
 exports[`Verify hierarchy shows as expected 10`] = `[]`;

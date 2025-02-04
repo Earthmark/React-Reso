@@ -107,13 +107,13 @@ export interface ElementPropFactory<
   refField: (def?: Normalized) => RefSetProp<TypeName, Input>;
 }
 
-function makeElementPropFactory<TypeName extends string, Input, Normalized>(
+function makePropFactory<TypeName extends string, Input, Normalized>(
   type: TypeName,
   differ: DifferImpl<Input, Normalized>
 ): ElementPropFactory<TypeName, Input, Normalized> {
   return {
-    indirectProp: () => makeElementRefFactory(`IField<${type}>`),
-    fluxProp: () => makeElementRefFactory(`INodeObjectOutput<${type}>`),
+    indirectProp: () => makeRefPropFactory(`IField<${type}>`),
+    fluxProp: () => makeRefPropFactory(`INodeObjectOutput<${type}>`),
     ref: () => makeRefProp(type),
     field: (def) => makeSetProp(differ, type, def),
     refField: (def) => ({
@@ -128,12 +128,12 @@ export type ElementRefFactory<TypeName extends string> = ElementPropFactory<
   FieldRef<TypeName>
 >;
 
-export function makeElementRefFactory<TypeName extends string>(
+export function makeRefPropFactory<TypeName extends string>(
   type: TypeName
 ): ElementRefFactory<TypeName> {
   return {
-    indirectProp: () => makeElementRefFactory(`IField<${type}>` as const),
-    fluxProp: () => makeElementRefFactory(`INodeObjectOutput<${type}>` as const),
+    indirectProp: () => makeRefPropFactory(`IField<${type}>` as const),
+    fluxProp: () => makeRefPropFactory(`INodeObjectOutput<${type}>` as const),
     ref: () => makeRefProp(type),
     field: () => refPropDiffer<TypeName>(),
     refField: () => ({
@@ -143,18 +143,13 @@ export function makeElementRefFactory<TypeName extends string>(
   };
 }
 
-type DifferImplToPropFactory<
-  TypeName extends string,
-  Differ
-> = Differ extends DifferImpl<infer Input, infer Normalize>
-  ? ElementPropFactory<TypeName, Input, Normalize>
-  : never;
-
-type ComponentElementPropFactories<TypeDiffers> = {
-  [PropType in Extract<keyof TypeDiffers, string>]: DifferImplToPropFactory<
-    PropType,
-    TypeDiffers[PropType]
-  >;
+type DiffersPropFactories<TypeDiffers> = {
+  [PropType in Extract<
+    keyof TypeDiffers,
+    string
+  >]: TypeDiffers[PropType] extends DifferImpl<infer Input, infer Normalize>
+    ? ElementPropFactory<PropType, Input, Normalize>
+    : never;
 };
 
 /**
@@ -162,15 +157,15 @@ type ComponentElementPropFactories<TypeDiffers> = {
  * @param propBases The primitive components to assemble into fully formed props, where the type name is the key.
  * @returns An object keyed by the input, where each value is an assembled prop differ.
  */
-export function propComponentsToPropFactories<
-  FactoryComponents extends Record<string, DifferImpl<unknown, unknown>>
->(
-  propBases: FactoryComponents
-): ComponentElementPropFactories<FactoryComponents> {
-  const result = {} as ComponentElementPropFactories<FactoryComponents>;
+export function differsToPropFactories<
+  FactoryComponents extends {
+    [K in keyof FactoryComponents]: DifferImpl<any, any>;
+  }
+>(propBases: FactoryComponents): DiffersPropFactories<FactoryComponents> {
+  const result = {} as DiffersPropFactories<FactoryComponents>;
   for (const key in propBases) {
     Object.assign(result, {
-      [key]: makeElementPropFactory(key, propBases[key]),
+      [key]: makePropFactory(key, propBases[key]),
     });
   }
   return result;
@@ -180,13 +175,13 @@ type ComponentsToRefFactories<TypeDiffers extends Record<string, string>> = {
   [PropType in keyof TypeDiffers]: ElementRefFactory<TypeDiffers[PropType]>;
 };
 
-export function refComponentsToRefFactories<
-  RefComponents extends Record<string, string>
+export function refTypesToRefPropFactories<
+  RefComponents extends { [K in keyof RefComponents]: string }
 >(refs: RefComponents): ComponentsToRefFactories<RefComponents> {
   const result = {} as ComponentsToRefFactories<RefComponents>;
   for (const key in refs) {
     Object.assign(result, {
-      [key]: makeElementRefFactory(refs[key]),
+      [key]: makeRefPropFactory(refs[key]),
     });
   }
   return result;

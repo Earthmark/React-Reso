@@ -12,15 +12,11 @@ export type ElementPropsToUpdaterInput<Fields> = {
 };
 
 type MapDefPropToType<T> = {
-  [E in keyof T]: ElementPropToType<T[E]>;
+  [E in keyof T]: T[E] extends SetProp<infer Value> ? Value : never;
 };
 
-type ElementPropToType<ElemProp> = ElemProp extends SetProp<infer Value>
-  ? Value
-  : never;
-
 export function elementPropsToUpdater<
-  Fields extends Record<keyof Fields, SetProp<any>>
+  Fields extends Record<string, SetProp<any>>
 >(elementProps: Fields): ElementUpdater<MapDefPropToType<Fields>> {
   return (oldProps, newProps, submit) => {
     for (const prop in elementProps) {
@@ -44,9 +40,9 @@ type ElementRefToType<ElemRef> = ElemRef extends RefProp<infer TypeName>
   ? TypeName
   : never;
 
-function elementPropsToRefFactory<
-  Fields extends ElementPropsToRefFactoryInput<Fields>
->(elementProps: Fields): ElementRefFactory<MapDefRefToRefType<Fields>> {
+function elementPropsToRefFactory<Fields extends Record<string, RefProp<any>>>(
+  elementProps: Fields
+): ElementRefFactory<MapDefRefToRefType<Fields>> {
   return (elementId) => {
     const refs = {} as FieldRefs<MapDefRefToRefType<Fields>>;
     for (const prop in elementProps) {

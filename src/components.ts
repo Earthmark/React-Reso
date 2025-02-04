@@ -204,7 +204,7 @@ export const componentDefs = elementPropsSetToTemplates({
   ...materials,
   ...textures,
   ...rectElements,
-});
+} as const);
 
 export type ElementProps = ElementTemplateSetJsxSignatureLibrary<typeof componentDefs>;
 

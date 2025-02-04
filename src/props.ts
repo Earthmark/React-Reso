@@ -1,7 +1,7 @@
 import {
   DifferImpl,
-  propComponentsToPropFactories,
-  refComponentsToRefFactories,
+  differsToPropFactories,
+  refTypesToRefPropFactories,
 } from "./propsBase";
 
 const int: DifferImpl<number, number> = {
@@ -132,7 +132,17 @@ const color = c4(float, { r: 0, g: 0, b: 0, a: 1 });
 
 const floatQ = v3(float, { x: 0, y: 0, z: 0 });
 
-type ColliderTypes = "NoCollision" | "Static" | "Trigger" | "StaticTrigger" | "StaticTriggerAuto" | "Active" | "HapticTrigger" | "HapticStaticTrigger" | "HapticStaticTriggerAuto" | "HapticSampler";
+type ColliderTypes =
+  | "NoCollision"
+  | "Static"
+  | "Trigger"
+  | "StaticTrigger"
+  | "StaticTriggerAuto"
+  | "Active"
+  | "HapticTrigger"
+  | "HapticStaticTrigger"
+  | "HapticStaticTriggerAuto"
+  | "HapticSampler";
 const colliderType: DifferImpl<ColliderTypes> = {
   normalize: (value) => {
     if (value === undefined) {
@@ -171,29 +181,33 @@ const bool: DifferImpl<boolean> = {
   equals: (a, b) => a === b,
 };
 
+const propFactories = differsToPropFactories({
+  int,
+  int2,
+  int3,
+  int4,
+  float,
+  float2,
+  float3,
+  float4,
+  floatQ,
+  color,
+  string,
+  uri: string,
+  bool,
+  colliderType,
+} as const);
+
+const refFactories = refTypesToRefPropFactories({
+  slot: "Slot",
+  material: "Material",
+  iTexture2D: "ITexture2D",
+  mesh: "Mesh",
+  user: "User",
+  syncImpulse: "ISyncNodeOperation",
+} as const);
+
 export default {
-  ...propComponentsToPropFactories({
-    int,
-    int2,
-    int3,
-    int4,
-    float,
-    float2,
-    float3,
-    float4,
-    floatQ,
-    color,
-    string,
-    uri: string,
-    bool,
-    colliderType,
-  } as const),
-  ...refComponentsToRefFactories({
-    slot: "Slot",
-    material: "Material",
-    iTexture2D: "ITexture2D",
-    mesh: "Mesh",
-    user: "User",
-    syncImpulse: "ISyncNodeOperation",
-  } as const),
+  ...propFactories,
+  ...refFactories,
 };

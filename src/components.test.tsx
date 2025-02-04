@@ -1,27 +1,14 @@
-import React from "react";
 import { PropUpdate } from "./signal";
-import n, { ElementProps, componentDefs } from "./components";
+import { ElementProps, componentDefs } from "./components";
 import prop from "./props";
-import { render, screen } from "@testing-library/react";
-import {
-  elementPropsToTemplate,
-  elementTemplatesToJsxPrototypes,
-} from "./componentsBase";
+import { elementPropsToTemplate } from "./componentsBase";
+
+global.IS_REACT_ACT_ENVIRONMENT = true;
 
 const simpleElement = elementPropsToTemplate({
   taco: prop.bool.field(),
 });
 
-const simpleObj = elementTemplatesToJsxPrototypes({ elem: simpleElement });
-
-test("Single Bool element can be created and matches snapshot", () => {
-  render(<simpleObj.elem taco={true} />);
-  expect(screen).toMatchInlineSnapshot(`
-<elem
-  taco={true}
-/>
-`);
-});
 test("Single boolean element can be updated.", () => {
   const propDiffs: Array<PropUpdate> = [];
   simpleElement.updater(
@@ -41,21 +28,6 @@ test("Single boolean element can be updated.", () => {
     "value": "true",
   },
 ]
-`);
-});
-
-test("Verify hierarchy shows as expected", () => {
-  render(<n.transform scale={{ x: 3, y: 3, z: 3 }} />);
-  expect(screen).toMatchInlineSnapshot(`
-<transform
-  scale={
-    Object {
-      "x": 3,
-      "y": 3,
-      "z": 3,
-    }
-  }
-/>
 `);
 });
 

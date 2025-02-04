@@ -1,6 +1,10 @@
 import React from "react";
 import Reconciler from "react-reconciler";
-import { DefaultEventPriority } from "react-reconciler/constants";
+import {
+  ConcurrentRoot,
+  DefaultEventPriority,
+  LegacyRoot,
+} from "react-reconciler/constants";
 import { ElementId, InboundSignal, OutboundSignal, PropUpdate } from "./signal";
 
 export interface ElementTemplate<Props, Refs> {
@@ -68,6 +72,7 @@ interface UnlistedReconcilerConfig {
   getCurrentUpdatePriority: () => number;
   setCurrentUpdatePriority: (priority: number) => void;
   resolveUpdatePriority: () => number;
+  maySuspendCommit: (type: any, props: any) => boolean;
 }
 
 function CreateReconcilerOptions<
@@ -102,7 +107,7 @@ function CreateReconcilerOptions<
     supportsHydration: false,
     supportsPersistence: false,
     noTimeout: -1,
-    isPrimaryRenderer: true,
+    isPrimaryRenderer: false,
 
     prepareUpdate(instance, type, oldProps, newProps) {
       const diffs: Array<PropUpdate> = [];
@@ -141,14 +146,7 @@ function CreateReconcilerOptions<
           props: delta.diffs,
         });
       }
-      return {
-        id,
-        container,
-        updater: template.updater,
-        refs: template.refFactory(id),
-        children: {},
-        events: {},
-      };
+      return instance;
     },
     createTextInstance() {
       throw new Error(
@@ -282,14 +280,14 @@ function CreateReconcilerOptions<
     resolveUpdatePriority() {
       return currentUpdatePriority || DefaultEventPriority;
     },
+    maySuspendCommit() {
+      return false;
+    },
   };
 }
 
 export default function createRender<
-  AdditionalComponents extends Record<
-    keyof AdditionalComponents,
-    ElementTemplate<any, any>
-  >
+  AdditionalComponents extends Record<string, ElementTemplate<any, any>>
 >(
   node: React.ReactNode,
   elementTemplates: AdditionalComponents
@@ -308,12 +306,14 @@ export default function createRender<
       };
       const container = reconciler.createContainer(
         containerInfo,
-        0,
+        LegacyRoot,
         null,
+        true,
         false,
-        null,
-        "rn",
-        (e) => {},
+        "",
+        (e) => {
+          throw e;
+        },
         null
       );
 
