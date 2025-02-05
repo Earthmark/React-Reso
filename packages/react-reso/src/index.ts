@@ -1,12 +1,11 @@
 import wsProxyServer from "./wsProxyServer";
-import n, { ElementProps, componentDefs } from "./components";
+import { ElementProps, componentDefs, rr } from "./components";
 import { useResoRef } from "./componentsBase";
 import createRender from "./renderer";
 import prop from "./props";
 import {
-  PropComponents,
-  propComponentsToPropFactories,
-  refComponentsToRefFactories,
+  differsToPropFactories,
+  refTypesToRefPropFactories,
 } from "./propsBase";
 import {
   hasReactChildren,
@@ -22,13 +21,11 @@ export {
   wsProxyServer,
   ElementProps,
   prop,
-  PropComponents,
-  propComponentsToPropFactories,
-  refComponentsToRefFactories,
+  differsToPropFactories,
+  refTypesToRefPropFactories,
   hasReactChildren,
   elementPropsSetToTemplates,
   elementTemplatesToJsxPrototypes,
-  ElementTemplateSetJsxSignatureLibrary
+  ElementTemplateSetJsxSignatureLibrary,
+  rr,
 };
-
-export default n;

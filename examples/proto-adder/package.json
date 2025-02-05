@@ -1,0 +1,20 @@
+{
+  "name": "proto-adder",
+  "version": "0.0.1",
+  "description": "A react renderer for resonite.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Earthmark/React-Reso.git"
+  },
+  "author": "Earthmark",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "prestart": "tsc"
+  },
+  "dependencies": {
+    "react-reso": "file:../../packages/react-reso"
+  }
+}

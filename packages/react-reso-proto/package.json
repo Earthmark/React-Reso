@@ -1,0 +1,27 @@
+{
+  "name": "react-reso-proto",
+  "version": "0.0.1",
+  "description": "A react renderer for resonite.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Earthmark/React-Reso.git"
+  },
+  "author": "Earthmark",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "./dist"
+  ],
+  "scripts": {
+    "test": "npx jest",
+    "build": "tsc",
+    "prebuild": "rimraf dist"
+  },
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-reconciler": "^0.28.0",
+    "ws": "^8.18.0"
+  }
+}

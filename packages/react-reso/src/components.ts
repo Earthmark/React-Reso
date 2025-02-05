@@ -10,7 +10,7 @@ const baseComponentDef = {
   name: prop.string.refField(),
   tag: prop.string.refField(),
   slot: prop.slot.ref(),
-}
+};
 
 const activateComponentDef = {
   ...baseComponentDef,
@@ -41,7 +41,7 @@ const transforms = {
     ...hasReactChildren(),
     speed: prop.float3.refField(),
     range: prop.float3.refField(),
-  }
+  },
 };
 
 const baseColliderComponentDef = {
@@ -56,7 +56,7 @@ const baseColliderComponentDef = {
 const colliders = {
   boxCollider: {
     ...baseColliderComponentDef,
-    size: prop.float3.field({x: 1, y: 1, z: 1}),
+    size: prop.float3.field({ x: 1, y: 1, z: 1 }),
   },
   capsuleCollider: {
     ...baseColliderComponentDef,
@@ -81,7 +81,7 @@ const colliders = {
   convexHullCollider: {
     ...baseColliderComponentDef,
     mesh: prop.mesh.field(),
-  }
+  },
 };
 
 const renderers = {
@@ -89,7 +89,7 @@ const renderers = {
     ...transformComponentDef,
     mesh: prop.mesh.field(),
     material: prop.material.field(),
-  }
+  },
 };
 
 const meshComponentBase = {
@@ -106,7 +106,7 @@ const meshes = {
     ...meshComponentBase,
     name: prop.string.refField(),
     tag: prop.string.refField(),
-    size: prop.float3.field({x: 1, y: 1, z: 1}),
+    size: prop.float3.field({ x: 1, y: 1, z: 1 }),
     uvScale: prop.float3.field(),
     scaleUvWithSize: prop.bool.field(),
   },
@@ -147,7 +147,7 @@ const textures = {
     anisotropicLevel: prop.int.field(),
     wrapModeU: prop.string.field(),
     wrapModeV: prop.string.field(),
-  }
+  },
 };
 
 const base2DComponentDef = {
@@ -189,8 +189,8 @@ const rectElements = {
   button: {
     ...base2DComponentDef,
     ...hasReactChildren(),
-  }
-}
+  },
+};
 
 export const componentDefs = elementPropsSetToTemplates({
   slot: {
@@ -206,6 +206,8 @@ export const componentDefs = elementPropsSetToTemplates({
   ...rectElements,
 } as const);
 
-export type ElementProps = ElementTemplateSetJsxSignatureLibrary<typeof componentDefs>;
+export type ElementProps = ElementTemplateSetJsxSignatureLibrary<
+  typeof componentDefs
+>;
 
-export default elementTemplatesToJsxPrototypes(componentDefs);
+export const rr = elementTemplatesToJsxPrototypes(componentDefs);
