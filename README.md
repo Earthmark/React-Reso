@@ -2,8 +2,6 @@
 
 A react renderer for Resonite, copying template "elements".
 
-## Runtime Architecture
-
 There are two parts of the React-Resonite architecture:
 
 1. React-Resonite Renderer Webserver (Server)
@@ -50,7 +48,7 @@ function RedBox() {
 runServer();
 ```
 
-### Communication Protocol
+## Communication Protocol
 
 Messages from the server to client instruct the client how to instance and customize elements.
 
@@ -67,7 +65,7 @@ The server will generally send events in this order:
 2. Clear `root`
 3. Reparent the 'root' elements in `staging` into `root` via `setParent`
 
-#### Message Formats
+### Message Formats
 
 The format uses only url-unsafe symbols as delimiters, Resonite only supports the URL encode and decode operations to encode data and that is used to pass strings that may otherwise include delimiter symbols.
 
@@ -125,16 +123,19 @@ update+2+hue=color=$+active=bool=false+|
 ```
 
 Messages may be sent as concatenated strings, or as multiple messages.
-Either way they are processed in-order.
+Either way they are processed logically in-order.
+
+## Client
+
+Due to it taking a few updates for dynamic variables to 'hook up'; create commands are run instantly (which kicks off the hook-up) and all other commands are delayed 10 update cycles. In practice this is not noticeable but if you see the delay in the client, that is why it is there.
 
 Note: Removing `root` does not remove the `root` slot, it removes all children under `root`.
 
-### Elements
+### Element Templates
 
-Elements are spawned forms of templates, with this hierarchy.
+Templates are the cold-stored form of an element, once the template is duplicated into `staging`, then it becomes an element.
 
-Templates (and their spawned elements) expose props,
-a piece of data that can be set or referenced in the spawned element.
+Templates (and their spawned elements) expose props that can be set, referenced, or both.
 
 There are three kinds of props:
 
