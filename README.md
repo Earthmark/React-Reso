@@ -9,6 +9,10 @@ There are two parts of the React-Resonite architecture:
 
 They communicate via a websocket.
 
+## TODO
+
+Fix rotation being wrong, likely because of handedness.
+
 ## Server Architecture
 
 The server is a nodejs websocket server running a custom react renderer.

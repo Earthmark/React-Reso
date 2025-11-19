@@ -1,5 +1,5 @@
 {
-  "name": "react-reso",
+  "name": "@rfmk/react-reso",
   "version": "0.0.1",
   "description": "A react renderer for resonite.",
   "repository": {
@@ -8,19 +8,34 @@
   },
   "author": "Earthmark",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "/dist"
-  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
   "scripts": {
-    "test": "npx jest",
-    "build": "tsc",
-    "prebuild": "rimraf build"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest"
   },
   "dependencies": {
-    "react": "^18.0.0",
     "react-reconciler": "^0.28.0",
     "ws": "^8.18.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/ws": "^8.5.10",
+    "@types/react-reconciler": "^0.28.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0"
   }
 }

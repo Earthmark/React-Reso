@@ -1,10 +1,6 @@
 import React from "react";
 import Reconciler from "react-reconciler";
-import {
-  ConcurrentRoot,
-  DefaultEventPriority,
-  LegacyRoot,
-} from "react-reconciler/constants";
+import { DefaultEventPriority, LegacyRoot } from "react-reconciler/constants";
 import { ElementId, InboundSignal, OutboundSignal, PropUpdate } from "./signal";
 
 export interface ElementTemplate<Props, Refs> {
@@ -21,14 +17,14 @@ export type ElementUpdater<Props = {}> = (
 export type ElementRefFactory<Refs> = (id: ElementId) => FieldRefs<Refs>;
 
 export type FieldRefs<FieldTypes> = {
-  [Field in keyof FieldTypes]: FieldRef<Extract<FieldTypes[Field], string>>;
+  [Field in keyof FieldTypes]: RefProp<Extract<FieldTypes[Field], string>>;
 };
 
-export interface FieldRef<TypeName extends string> {
+export type RefProp<TypeName extends string> = {
   type: TypeName;
   propName: string;
-  elementId: string;
-}
+  elementId: string | null;
+};
 
 export interface ReactResoRenderer {
   createInstance(handler: (signal: OutboundSignal) => void): {
@@ -43,7 +39,6 @@ interface Container extends LogicalInstance {
 
 interface RenderedInstance extends LogicalInstance {
   container: Container;
-  updater: ElementUpdater<any>;
   refs: FieldRefs<any>;
 }
 
@@ -76,10 +71,7 @@ interface UnlistedReconcilerConfig {
 }
 
 function CreateReconcilerOptions<
-  AdditionalComponents extends Record<
-    keyof AdditionalComponents,
-    ElementTemplate<any, any>
-  >
+  AdditionalComponents extends Record<string, ElementTemplate<any, any>>
 >(
   components: AdditionalComponents,
   handler: (signal: OutboundSignal) => void
@@ -111,7 +103,7 @@ function CreateReconcilerOptions<
 
     prepareUpdate(instance, type, oldProps, newProps) {
       const diffs: Array<PropUpdate> = [];
-      instance.updater(oldProps, newProps, (p) => diffs.push(p));
+      components[type].updater(oldProps, newProps, (p) => diffs.push(p));
       return diffs.length > 0 ? { diffs } : null;
     },
 

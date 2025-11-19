@@ -1,15 +1,64 @@
-import { rr, createRender, wsProxyServer, componentDefs } from "react-reso";
+import React from "react";
+import { rr, createRender, wsProxyServer, componentDefs, useResoRef } from "react-reso";
 
 export function runServer() {
-  const render = createRender(<SmallRedBox />, componentDefs);
+  const render = createRender(<MoreComplicatedBox />, componentDefs);
   wsProxyServer(render, { port: 8080 });
   console.log("Server started on port 8080");
 }
 
-const SmallRedBox = () => {
-  return (
-    <rr.boxMesh/>
-  );
-};
+interface Vector {
+  x: number,
+  y: number,
+  z: number,
+}
+
+function vecSub(a: Vector, b: Vector): Vector {
+  const x = a.x - b.x;
+  const y = a.y - b.y;
+  const z = a.z - b.z;
+  return { x, y, z };
+}
+
+const MoreComplicatedBox = () => {
+  const v = vecSub({ x: 1, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+
+  const [{ material }, matRefGetter] = useResoRef(rr.unlitMaterial);
+  const [{ mesh }, meshRefGetter] = useResoRef(rr.boxMesh);
+
+  const [angle, setAngle] = React.useState(() => 0.0);
+
+  React.useEffect(() => {
+    var timer = setInterval(() => setAngle(s => s + 1.2), 1000);
+    return () => clearInterval(timer);
+  });
+
+  const rotation0 = {
+    x: Math.atan2(v.x, v.y) * (180 / Math.PI) + angle,
+    y: Math.atan2(v.x, v.z) * (180 / Math.PI)
+  }
+  const rotation1 = {
+    x: Math.atan2(v.x, v.y) * (180 / Math.PI) + angle + 240,
+    y: Math.atan2(v.x, v.z) * (180 / Math.PI)
+  }
+  const rotation2 = {
+    x: Math.atan2(v.x, v.y) * (180 / Math.PI) + angle + 120,
+    y: Math.atan2(v.x, v.z) * (180 / Math.PI)
+  }
+
+  return <rr.transform>
+    <rr.unlitMaterial color={{ r: 0.25 }} ref={matRefGetter} />
+    <rr.boxMesh ref={meshRefGetter} size={{ x: 0.1, y: 0.1, z: 0.3 }} />
+    <rr.transform rotation={rotation0}>
+      <rr.meshRenderer position={{ z: 0.4 }} mesh={mesh} material={material} />
+    </rr.transform>
+    <rr.transform rotation={rotation1}>
+      <rr.meshRenderer position={{ z: 0.4 }} mesh={mesh} material={material} />
+    </rr.transform>
+    <rr.transform rotation={rotation2}>
+      <rr.meshRenderer position={{ z: 0.4 }} mesh={mesh} material={material} />
+    </rr.transform>
+  </rr.transform>;
+}
 
 runServer();

@@ -5,42 +5,42 @@ import {
   ElementRefFactory,
   FieldRefs,
 } from "./renderer";
-import { RefProp, SetProp } from "./propsBase";
+import { RefPropFactory, SetPropFactory } from "./propsBase";
 
 export type ElementPropsToUpdaterInput<Fields> = {
-  [Field in keyof Fields]: Partial<SetProp<any>>;
+  [Field in keyof Fields]: Partial<SetPropFactory<any>>;
 };
 
 type MapDefPropToType<T> = {
-  [E in keyof T]: T[E] extends SetProp<infer Value> ? Value : never;
+  [E in keyof T]: T[E] extends SetPropFactory<infer Value> ? Value : never;
 };
 
 export function elementPropsToUpdater<
-  Fields extends Record<string, SetProp<any>>
+  Fields extends Record<string, SetPropFactory<any>>
 >(elementProps: Fields): ElementUpdater<MapDefPropToType<Fields>> {
   return (oldProps, newProps, submit) => {
     for (const prop in elementProps) {
       const element = elementProps[prop];
-      if (element.field) {
-        element.field(prop, oldProps[prop], newProps[prop], submit);
+      if (element.set) {
+        element.set(prop, oldProps[prop], newProps[prop], submit);
       }
     }
   };
 }
 
 export type ElementPropsToRefFactoryInput<Fields> = {
-  [Field in keyof Fields]: RefProp<any>;
+  [Field in keyof Fields]: RefPropFactory<any>;
 };
 
 type MapDefRefToRefType<T> = {
   [E in keyof T]: ElementRefToType<T[E]>;
 };
 
-type ElementRefToType<ElemRef> = ElemRef extends RefProp<infer TypeName>
+type ElementRefToType<ElemRef> = ElemRef extends RefPropFactory<infer TypeName>
   ? TypeName
   : never;
 
-function elementPropsToRefFactory<Fields extends Record<string, RefProp<any>>>(
+function elementPropsToRefFactory<Fields extends Record<string, RefPropFactory<any>>>(
   elementProps: Fields
 ): ElementRefFactory<MapDefRefToRefType<Fields>> {
   return (elementId) => {
@@ -48,7 +48,7 @@ function elementPropsToRefFactory<Fields extends Record<string, RefProp<any>>>(
     for (const prop in elementProps) {
       const element = elementProps[prop];
       if (element.ref) {
-        refs[prop] = element.ref(elementId, prop);
+        refs[prop] = element.ref(prop, elementId);
       }
     }
     return refs;
@@ -60,8 +60,8 @@ type ElementPropTemplateInput<Props, Refs> =
   | ElementPropsToRefFactoryInput<Refs>;
 
 type DefinitionToElementTemplate<Definition> = ElementTemplate<
-  MapDefPropToType<FilterByValue<Definition, SetProp<any>>>,
-  MapDefRefToRefType<FilterByValue<Definition, RefProp<any>>>
+  MapDefPropToType<FilterByValue<Definition, SetPropFactory<any>>>,
+  MapDefRefToRefType<FilterByValue<Definition, RefPropFactory<any>>>
 >;
 
 type FilterByValue<Source, ValueFilter> = {
@@ -175,7 +175,7 @@ export function elementTemplatesToJsxPrototypes<ElementTemplates extends {}>(
  * @returns A type declaration that implies the element has react children.
  */
 export function hasReactChildren(): {
-  children: SetProp<ReactNode>;
+  children: SetPropFactory<ReactNode>;
 } {
   return {} as unknown as any;
 }

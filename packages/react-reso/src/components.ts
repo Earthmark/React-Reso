@@ -7,22 +7,22 @@ import {
 } from "./componentsBase";
 
 const baseComponentDef = {
-  name: prop.string.refField(),
-  tag: prop.string.refField(),
+  name: prop.string.set(),
+  tag: prop.string.set(),
   slot: prop.slot.ref(),
 };
 
 const activateComponentDef = {
   ...baseComponentDef,
-  active: prop.bool.refField(),
-  persistent: prop.bool.refField(),
+  active: prop.bool.set(),
+  persistent: prop.bool.set(),
 };
 
 const transformComponentDef = {
   ...activateComponentDef,
-  position: prop.float3.refField(),
-  rotation: prop.floatQ.refField(),
-  scale: prop.float3.refField({ x: 1, y: 1, z: 1 }),
+  position: prop.float3.set(),
+  rotation: prop.floatQ.set(),
+  scale: prop.float3.set({ x: 1, y: 1, z: 1 }),
 };
 
 const transforms = {
@@ -33,62 +33,62 @@ const transforms = {
   smoothTransform: {
     ...transformComponentDef,
     ...hasReactChildren(),
-    smoothTransformEnabled: prop.bool.refField(),
-    smoothSpeed: prop.float.refField(),
+    smoothTransformEnabled: prop.bool.set(),
+    smoothSpeed: prop.float.set(),
   },
   spinner: {
     ...transformComponentDef,
     ...hasReactChildren(),
-    speed: prop.float3.refField(),
-    range: prop.float3.refField(),
+    speed: prop.float3.set(),
+    range: prop.float3.set(),
   },
 };
 
 const baseColliderComponentDef = {
   ...transformComponentDef,
-  offset: prop.float3.field(),
-  type: prop.colliderType.field(),
-  mass: prop.float.field(),
-  characterCollider: prop.bool.field(),
-  ignoreRaycasts: prop.bool.field(),
+  offset: prop.float3.set(),
+  type: prop.colliderType.set(),
+  mass: prop.float.set(),
+  characterCollider: prop.bool.set(),
+  ignoreRaycasts: prop.bool.set(),
 };
 
 const colliders = {
   boxCollider: {
     ...baseColliderComponentDef,
-    size: prop.float3.field({ x: 1, y: 1, z: 1 }),
+    size: prop.float3.set({ x: 1, y: 1, z: 1 }),
   },
   capsuleCollider: {
     ...baseColliderComponentDef,
-    height: prop.float.field(),
-    radius: prop.float.field(),
+    height: prop.float.set(),
+    radius: prop.float.set(),
   },
   coneCollider: {
     ...baseColliderComponentDef,
-    height: prop.float.field(),
-    radius: prop.float.field(),
+    height: prop.float.set(),
+    radius: prop.float.set(),
   },
   sphereCollider: {
     ...baseColliderComponentDef,
-    radius: prop.float.field(),
+    radius: prop.float.set(),
   },
   meshCollider: {
     ...baseColliderComponentDef,
-    mesh: prop.mesh.field(),
-    sidedness: prop.string.field(),
-    actualSpeculativeMargin: prop.float.field(),
+    mesh: prop.mesh.set(),
+    sidedness: prop.string.set(),
+    actualSpeculativeMargin: prop.float.set(),
   },
   convexHullCollider: {
     ...baseColliderComponentDef,
-    mesh: prop.mesh.field(),
+    mesh: prop.mesh.set(),
   },
 };
 
 const renderers = {
   meshRenderer: {
     ...transformComponentDef,
-    mesh: prop.mesh.field(),
-    material: prop.material.field(),
+    mesh: prop.mesh.set(),
+    material: prop.material.set(),
   },
 };
 
@@ -100,21 +100,21 @@ const meshComponentBase = {
 const meshes = {
   mesh: {
     ...meshComponentBase,
-    url: prop.uri.refField(),
+    url: prop.uri.set(),
   },
   boxMesh: {
     ...meshComponentBase,
-    name: prop.string.refField(),
-    tag: prop.string.refField(),
-    size: prop.float3.field({ x: 1, y: 1, z: 1 }),
-    uvScale: prop.float3.field(),
-    scaleUvWithSize: prop.bool.field(),
+    name: prop.string.set(),
+    tag: prop.string.set(),
+    size: prop.float3.set({ x: 1, y: 1, z: 1 }),
+    uvScale: prop.float3.set(),
+    scaleUvWithSize: prop.bool.set(),
   },
   sphereMesh: {
     ...meshComponentBase,
-    name: prop.string.refField(),
-    tag: prop.string.refField(),
-    radius: prop.float.field(),
+    name: prop.string.set(),
+    tag: prop.string.set(),
+    radius: prop.float.set(),
   },
 };
 
@@ -126,11 +126,11 @@ const materialComponentBase = {
 const materials = {
   unlitMaterial: {
     ...materialComponentBase,
-    color: prop.color.refField(),
+    color: prop.color.set(),
   },
   pbsSpecularMaterial: {
     ...materialComponentBase,
-    color: prop.color.refField(),
+    color: prop.color.set(),
   },
 };
 
@@ -142,21 +142,21 @@ const textureComponentBase = {
 const textures = {
   texture2D: {
     ...textureComponentBase,
-    url: prop.uri.field(),
-    filterMode: prop.string.field(),
-    anisotropicLevel: prop.int.field(),
-    wrapModeU: prop.string.field(),
-    wrapModeV: prop.string.field(),
+    url: prop.uri.set(),
+    filterMode: prop.string.set(),
+    anisotropicLevel: prop.int.set(),
+    wrapModeU: prop.string.set(),
+    wrapModeV: prop.string.set(),
   },
 };
 
 const base2DComponentDef = {
   ...activateComponentDef,
-  anchorMin: prop.float2.refField(),
-  anchorMax: prop.float2.refField(),
-  offsetMin: prop.float2.refField(),
-  offsetMax: prop.float2.refField(),
-  pivot: prop.float2.refField(),
+  anchorMin: prop.float2.set(),
+  anchorMax: prop.float2.set(),
+  offsetMin: prop.float2.set(),
+  offsetMax: prop.float2.set(),
+  pivot: prop.float2.set(),
 };
 
 const rectElements = {
@@ -171,7 +171,7 @@ const rectElements = {
   image: {
     ...base2DComponentDef,
     ...hasReactChildren(),
-    color: prop.color.refField(),
+    color: prop.color.set(),
   },
   horizontalLayout: {
     ...base2DComponentDef,
@@ -183,8 +183,8 @@ const rectElements = {
   },
   text: {
     ...base2DComponentDef,
-    children: prop.string.refField(),
-    color: prop.color.refField(),
+    children: prop.string.set(),
+    color: prop.color.set(),
   },
   button: {
     ...base2DComponentDef,

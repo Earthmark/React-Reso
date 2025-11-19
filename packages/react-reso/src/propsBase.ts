@@ -1,5 +1,5 @@
 import { PropUpdate } from "./signal";
-import { FieldRef } from "./renderer";
+import { RefProp } from "./renderer";
 
 /**
  * A helper function that wraps the core parts of diffing a prop, calling them using a regular boilerplate.
@@ -29,7 +29,7 @@ function makeDiffer<Input, Normalized = Input>(
 
 export interface DifferImpl<Input, Normalized = Input> {
   normalize(value: Input, def?: Normalized): Normalized;
-  stringify(value: Normalized): string;
+  stringify(value: Normalized): string | null;
   equals(a: Normalized, b: Normalized): boolean;
 }
 
@@ -40,23 +40,33 @@ type PropDiffer<Input> = (
   submit: (update: PropUpdate) => void
 ) => void;
 
-export interface RefProp<TypeName extends string> {
-  ref: (elementId: string, propName: string) => FieldRef<TypeName>;
+type useRefInitial<TypeName extends string> = Omit<
+  RefProp<TypeName>,
+  "elementId"
+> & {
+  elementId: null;
+};
+
+export interface RefPropFactory<TypeName extends string> {
+  ref: (propName: string, elementId: string) => RefProp<TypeName>;
+  useRefSubprop: (propName: string) => useRefInitial<TypeName>;
 }
 
-export interface SetProp<Input> {
-  field: PropDiffer<Input>;
+export interface SetPropFactory<Input> {
+  set: PropDiffer<Input>;
 }
-
-export type RefSetProp<TypeName extends string, Input> = RefProp<TypeName> &
-  SetProp<Input>;
 
 function makeRefProp<TypeName extends string>(
   type: TypeName
-): RefProp<TypeName> {
+): RefPropFactory<TypeName> {
   return {
-    ref: (elementId, propName) => ({
+    ref: (propName, elementId) => ({
       elementId,
+      propName,
+      type,
+    }),
+    useRefSubprop: (propName) => ({
+      elementId: null,
       propName,
       type,
     }),
@@ -67,18 +77,21 @@ function makeSetProp<Input, Normalized>(
   differ: DifferImpl<Input, Normalized>,
   type: string,
   def?: Normalized
-): SetProp<Input> {
+): SetPropFactory<Input> {
   return {
-    field: makeDiffer(differ, type, def),
+    set: makeDiffer(differ, type, def),
   };
 }
 
-function refPropDiffer<TypeName extends string>(): SetProp<FieldRef<TypeName>> {
+function refPropDiffer<TypeName extends string>(): SetPropFactory<
+  RefProp<TypeName>
+> {
   return {
-    field: makeDiffer(
+    set: makeDiffer(
       {
         normalize: (value) => value,
-        stringify: (value) => `${value.elementId}.${value.propName}`,
+        stringify: (value) =>
+          value.elementId ? `${value.elementId}.${value.propName}` : null,
         equals: (a, b) =>
           a.elementId === b.elementId &&
           a.propName === b.propName &&
@@ -94,17 +107,8 @@ export interface ElementPropFactory<
   Input,
   Normalized = Input
 > {
-  indirectProp: () => ElementPropFactory<
-    `IField<${TypeName}>`,
-    FieldRef<`IField<${TypeName}>`>
-  >;
-  fluxProp: () => ElementPropFactory<
-    `INodeObjectOutput<${TypeName}>`,
-    FieldRef<`INodeObjectOutput<${TypeName}>`>
-  >;
-  ref: () => RefProp<TypeName>;
-  field: (def?: Normalized) => SetProp<Input>;
-  refField: (def?: Normalized) => RefSetProp<TypeName, Input>;
+  ref: () => RefPropFactory<TypeName>;
+  set: (def?: Normalized) => SetPropFactory<Input>;
 }
 
 function makePropFactory<TypeName extends string, Input, Normalized>(
@@ -112,34 +116,22 @@ function makePropFactory<TypeName extends string, Input, Normalized>(
   differ: DifferImpl<Input, Normalized>
 ): ElementPropFactory<TypeName, Input, Normalized> {
   return {
-    indirectProp: () => makeRefPropFactory(`IField<${type}>`),
-    fluxProp: () => makeRefPropFactory(`INodeObjectOutput<${type}>`),
     ref: () => makeRefProp(type),
-    field: (def) => makeSetProp(differ, type, def),
-    refField: (def) => ({
-      ...makeRefProp(type),
-      ...makeSetProp(differ, type, def),
-    }),
+    set: (def) => makeSetProp(differ, type, def),
   };
 }
 
 export type ElementRefFactory<TypeName extends string> = ElementPropFactory<
   TypeName,
-  FieldRef<TypeName>
+  RefProp<TypeName>
 >;
 
 export function makeRefPropFactory<TypeName extends string>(
   type: TypeName
 ): ElementRefFactory<TypeName> {
   return {
-    indirectProp: () => makeRefPropFactory(`IField<${type}>` as const),
-    fluxProp: () => makeRefPropFactory(`INodeObjectOutput<${type}>` as const),
     ref: () => makeRefProp(type),
-    field: () => refPropDiffer<TypeName>(),
-    refField: () => ({
-      ...makeRefProp(type),
-      ...refPropDiffer<TypeName>(),
-    }),
+    set: () => refPropDiffer<TypeName>(),
   };
 }
 
