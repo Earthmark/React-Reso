@@ -1,7 +1,8 @@
+import { describe, it, expect, vi } from "vitest";
 import React from "react";
 import createRender from "./renderer";
 import { useResoRef } from "./componentsBase";
-import n, { componentDefs } from "./components";
+import { componentDefs, rr } from "./components";
 import { OutboundSignal } from "./signal";
 
 interface Fixture {
@@ -20,7 +21,7 @@ function createSignalListener(node: React.ReactNode) {
   return { messages, instance };
 }
 
-test("Verify hierarchy shows as expected", () => {
+it("Verify hierarchy shows as expected", () => {
   var updater: (
     handler: (newController: Fixture) => Fixture
   ) => void = () => {};
@@ -33,22 +34,22 @@ test("Verify hierarchy shows as expected", () => {
     updater = setFixture;
     return (
       <React.Fragment>
-        <n.transform position={{ x: 2, y: 4, z: 19 }}>
+        <rr.transform position={{ x: 2, y: 4, z: 19 }}>
           {c.toggleCanvas ? (
-            <n.boxMesh />
+            <rr.boxMesh />
           ) : (
-            <n.text>This contains text!</n.text>
+            <rr.text>This contains text!</rr.text>
           )}
-          <n.canvas>
+          <rr.canvas>
             {c.objects.map((o) => (
-              <n.text key={o.id} anchorMin={c.subValue}>
+              <rr.text key={o.id} anchorMin={c.subValue}>
                 {o.id}
-              </n.text>
+              </rr.text>
             ))}
-          </n.canvas>
-        </n.transform>
-        {c.toggleChildBox ? <n.boxMesh /> : null}
-        <n.transform />
+          </rr.canvas>
+        </rr.transform>
+        {c.toggleChildBox ? <rr.boxMesh /> : null}
+        <rr.transform />
       </React.Fragment>
     );
   };
@@ -106,15 +107,15 @@ test("Verify hierarchy shows as expected", () => {
   messages.length = 0;
 });
 
-test("Refs Interconnect", () => {
+it("Refs Interconnect", () => {
   const TestComponent = () => {
-    const [unlitMat, refUnlitMat] = useResoRef(n.unlitMaterial);
+    const [unlitMat, refUnlitMat] = useResoRef(rr.unlitMaterial);
     return (
       <React.Fragment>
-        <n.unlitMaterial color={{ r: 1, g: 0, b: 1 }} ref={refUnlitMat} />
-        <n.transform position={{ x: 2, y: 4, z: 19 }}>
-          <n.meshRenderer material={unlitMat.material} />
-        </n.transform>
+        <rr.unlitMaterial color={{ r: 1, g: 0, b: 1 }} ref={refUnlitMat} />
+        <rr.transform position={{ x: 2, y: 4, z: 19 }}>
+          <rr.meshRenderer material={unlitMat.material} />
+        </rr.transform>
       </React.Fragment>
     );
   };
@@ -124,7 +125,7 @@ test("Refs Interconnect", () => {
   expect(messages).toMatchSnapshot();
 });
 
-test("unexpected components raise errors", () => {
+it("unexpected components raise errors", () => {
   const renderer = createRender(<div />, componentDefs);
   const items: Array<OutboundSignal> = [];
   expect(() =>
@@ -132,9 +133,9 @@ test("unexpected components raise errors", () => {
   ).toThrow();
 });
 
-test("components raise errors when they unexpectedly contain text", () => {
+it("components raise errors when they unexpectedly contain text", () => {
   const renderer = createRender(
-    <n.transform>{"I'm illegal!" as any}</n.transform>,
+    <rr.transform>{"I'm illegal!" as any}</rr.transform>,
     componentDefs
   );
   const items: Array<OutboundSignal> = [];

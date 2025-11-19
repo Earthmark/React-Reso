@@ -1,6 +1,7 @@
+import { describe, it, expect, vi } from "vitest";
 import { stringifySignalArray, parseSignal } from "./signalFormatter";
 
-test("stringify returns encoded create", () => {
+it("stringify returns encoded create", () => {
   expect(
     stringifySignalArray([
       {
@@ -12,7 +13,7 @@ test("stringify returns encoded create", () => {
   ).toMatchInlineSnapshot(`"create+1+transform|"`);
 });
 
-test("stringify returns encoded remove", () => {
+it("stringify returns encoded remove", () => {
   expect(
     stringifySignalArray([
       {
@@ -23,7 +24,7 @@ test("stringify returns encoded remove", () => {
   ).toMatchInlineSnapshot(`"remove+1|"`);
 });
 
-test("stringify returns encoded empty update", () => {
+it("stringify returns encoded empty update", () => {
   expect(
     stringifySignalArray([
       {
@@ -35,7 +36,7 @@ test("stringify returns encoded empty update", () => {
   ).toMatchInlineSnapshot(`"update+1+|"`);
 });
 
-test("stringify returns encoded single update", () => {
+it("stringify returns encoded single update", () => {
   expect(
     stringifySignalArray([
       {
@@ -53,7 +54,7 @@ test("stringify returns encoded single update", () => {
   ).toMatchInlineSnapshot(`"update+1+a=float3=$+|"`);
 });
 
-test("stringify returns encoded update", () => {
+it("stringify returns encoded update", () => {
   expect(
     stringifySignalArray([
       {
@@ -77,7 +78,7 @@ test("stringify returns encoded update", () => {
   ).toMatchInlineSnapshot(`"update+1+a=float3=$+a=string=abcdefg+|"`);
 });
 
-test("stringify returns encoded update", () => {
+it("stringify returns encoded update", () => {
   expect(
     stringifySignalArray([
       {
@@ -89,7 +90,7 @@ test("stringify returns encoded update", () => {
   ).toMatchInlineSnapshot(`"setParent+1+2+$|"`);
 });
 
-test("stringify returns encoded update with child id", () => {
+it("stringify returns encoded update with child id", () => {
   expect(
     stringifySignalArray([
       {
@@ -102,7 +103,7 @@ test("stringify returns encoded update with child id", () => {
   ).toMatchInlineSnapshot(`"setParent+1+2+3|"`);
 });
 
-test("stringify returns expected encoded strings", () => {
+it("stringify returns expected encoded strings", () => {
   expect(
     stringifySignalArray([
       {
@@ -163,7 +164,7 @@ test("stringify returns expected encoded strings", () => {
   );
 });
 
-test("parse creates expected message", () => {
+it("parse creates expected message", () => {
   expect(parseSignal("event+2+click+msg")).toStrictEqual([
     {
       arg: "msg",
@@ -174,10 +175,10 @@ test("parse creates expected message", () => {
   ]);
 });
 
-test("parse undefined returns undefined", () => {
+it("parse undefined returns undefined", () => {
   expect(parseSignal()).toStrictEqual(undefined);
 });
 
-test("parse unknown message returns undefined", () => {
+it("parse unknown message returns undefined", () => {
   expect(parseSignal("oddMessage+2+click+msg")).toStrictEqual(undefined);
 });

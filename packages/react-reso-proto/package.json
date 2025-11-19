@@ -1,7 +1,7 @@
 {
-  "name": "react-reso-proto",
+  "name": "@rfmk/react-reso-proto",
   "version": "0.0.1",
-  "description": "A react renderer for resonite.",
+  "description": "A protobuf library for the react resonite tool.",
   "repository": {
     "type": "git",
     "url": "https://github.com/Earthmark/React-Reso.git"
@@ -9,18 +9,33 @@
   "author": "Earthmark",
   "license": "MIT",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "./dist"
-  ],
-  "scripts": {
-    "test": "npx jest",
-    "build": "tsc"
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
   },
-  "dependencies": {
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "lint": "eslint src/"
+  },
+  "dependencies": {},
+  "peerDependencies": {
     "react": "^18.0.0",
-    "react-reconciler": "^0.28.0",
-    "ws": "^8.18.0"
+    "@rfmk/react-reso": "workspace:*"
+  },
+  "devDependencies": {
+    "@rfmk/react-reso": "workspace:*",
+    "@types/react": "^18.2.0",
+    "react": "^18.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0"
   }
 }

@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from "vitest";
 import { ElementPropFactory } from "./propsBase";
 import props from "./props";
 import { PropUpdate } from "./signal";
@@ -175,7 +176,7 @@ function testPropFactory<
   [oldValue, newValue, expected]: TestCaseInput<PropFactory>
 ) {
   const diff: PropUpdate[] = [];
-  factory.field().field("msg", oldValue, newValue, (n) => diff.push(n));
+  factory.set().set("msg", oldValue, newValue, (n) => diff.push(n));
   expect(diff[0]).toStrictEqual(
     expected === undefined
       ? undefined
@@ -187,17 +188,19 @@ function testPropFactory<
   );
 }
 
-test("Test case maps", () => {
-  for (const cases in testCases) {
-    let caseList = testCases[cases as keyof typeof testCases];
-    if (caseList) {
-      for (const testCase of caseList) {
-        testPropFactory(
-          cases as any,
-          (props as any)[cases as any] as any,
-          testCase
-        );
+describe("props", () => {
+  it("Test case maps", () => {
+    for (const cases in testCases) {
+      let caseList = testCases[cases as keyof typeof testCases];
+      if (caseList) {
+        for (const testCase of caseList) {
+          testPropFactory(
+            cases as any,
+            (props as any)[cases as any] as any,
+            testCase
+          );
+        }
       }
     }
-  }
+  });
 });
