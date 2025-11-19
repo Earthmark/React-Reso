@@ -1,5 +1,5 @@
 import React from "react";
-import { rr, createRender, wsProxyServer, componentDefs, useResoRef } from "react-reso";
+import { rr, createRender, wsProxyServer, componentDefs, useResoRef } from "@rfmk/react-reso";
 
 export function runServer() {
   const render = createRender(<MoreComplicatedBox />, componentDefs);

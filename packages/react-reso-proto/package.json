@@ -16,8 +16,7 @@
   ],
   "scripts": {
     "test": "npx jest",
-    "build": "tsc",
-    "prebuild": "rimraf dist"
+    "build": "tsc"
   },
   "dependencies": {
     "react": "^18.0.0",
