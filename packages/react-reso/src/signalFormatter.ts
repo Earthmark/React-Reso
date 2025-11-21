@@ -3,29 +3,42 @@ import { OutboundSignal, InboundSignal } from "./signal";
 export const nullSymbol: "$" = "$";
 
 function stringifyOutboundSignal(signal: OutboundSignal): string {
+  let parts: Array<string> = [];
   switch (signal.signal) {
     case "create":
-      return `create+${signal.id}+${signal.type}`;
+      parts.push("create", signal.id, signal.type);
+      break;
     case "remove":
-      return `remove+${signal.id}`;
+      parts.push("remove", signal.id);
+      break;
     case "update":
-      return `update+${signal.id}+${signal.props
-        .map(
-          (update) =>
-            `${update.prop}=${update.type}=${
-              update.value === null ? nullSymbol : update.value
-            }+`
+      parts.push(
+        "update",
+        signal.id,
+        ...signal.props.map((update) =>
+          [
+            update.prop,
+            update.type,
+            update.value === null ? nullSymbol : update.value,
+          ].join("=")
         )
-        .join("")}`;
+      );
+      break;
     case "setParent":
-      return `setParent+${signal.id}+${signal.parentId}+${
-        signal.after === undefined ? "$" : signal.after
-      }`;
+      parts.push(
+        "setParent",
+        signal.id,
+        signal.parentId,
+        signal.after === undefined ? nullSymbol : signal.after
+      );
+      break;
   }
+
+  return parts.join("+");
 }
 
 export function stringifySignalArray(signals: Array<OutboundSignal>): string {
-  return signals.map(stringifyOutboundSignal).join("|") + "|";
+  return signals.map(stringifyOutboundSignal).join("\n");
 }
 export function parseSignal(signal?: string): Array<InboundSignal> | undefined {
   if (signal === undefined) {

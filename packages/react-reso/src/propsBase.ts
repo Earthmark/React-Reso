@@ -49,7 +49,7 @@ type useRefInitial<TypeName extends string> = Omit<
 
 export interface RefPropFactory<TypeName extends string> {
   ref: (propName: string, elementId: string) => RefProp<TypeName>;
-  useRefSubprop: (propName: string) => useRefInitial<TypeName>;
+  useRefSubProp: (propName: string) => useRefInitial<TypeName>;
 }
 
 export interface SetPropFactory<Input> {
@@ -65,7 +65,7 @@ function makeRefProp<TypeName extends string>(
       propName,
       type,
     }),
-    useRefSubprop: (propName) => ({
+    useRefSubProp: (propName) => ({
       elementId: null,
       propName,
       type,

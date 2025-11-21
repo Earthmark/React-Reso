@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
@@ -16,7 +16,7 @@
 		<ResonitePath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/Resonite/')">$(HOME)/.steam/steam/steamapps/common/Resonite/</ResonitePath>
 		<ResonitePath Condition="Exists('E:\Programs\Steam\steamapps\common\Resonite')">E:\Programs\Steam\steamapps\common\Resonite\</ResonitePath>
 		<ResonitePath Condition="Exists('F:\Steam\steamapps\common\Resonite')">F:\Steam\steamapps\common\Resonite\</ResonitePath>
-		<ResoniteCoreLibs>$(ResonitePath)\Resonite_Data\Managed</ResoniteCoreLibs>
+		<ResoniteCoreLibs>$(ResonitePath)</ResoniteCoreLibs>
 		<ResoniteNmlLibs>$(ResonitePath)\rml_libs</ResoniteNmlLibs>
 		<ResoniteNmlMods>$(ResonitePath)\rml_mods</ResoniteNmlMods>
 		<ResoniteLibs>$(ResonitePath)\Libraries</ResoniteLibs>
@@ -25,6 +25,7 @@
 	<ItemGroup>
 		<ResoniteManagedFiles Include="$(ResoniteCoreLibs)\**\*.*" />
 		<ResoniteNativeFiles Include="$(ResonitePath)\Resonite_Data\Plugins\x86_64\**\*.*" />
+		<ResoniteNativeFiles Include="$(ResonitePath)\runtimes\win-x64\native\**\*.*" />
 	</ItemGroup>
 
 	<Target Name="CopyResoniteDependencies" AfterTargets="AfterBuild" Condition="Exists($(ResonitePath))">
@@ -74,11 +75,7 @@
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Newtonsoft.Json.Bson" Version="1.0.3" />
-		<PackageReference Include="System.Memory" Version="4.5.5" />
-		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
 		<PackageReference Include="System.Security.Permissions" Version="9.0.2" />
-		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
 	</ItemGroup>
 
 </Project>

@@ -29,24 +29,35 @@ int bucketCount = 0;
 int containsCount = 0;
 foreach (var (archetypeName, templates) in nodeArchetypes)
 {
+    Console.WriteLine($"Importing archetype {archetypeName}");
     foreach (var (templateName, type) in templates)
     {
+        Console.WriteLine($"Including {type} as {templateName}");
         try
         {
             var template = ProtoTemplateBuilder.BuildTemplate(workspace, library, type, templateName);
             template.SaveObject(DependencyHandling.BreakAll);
             containsCount++;
             templateCount++;
+
         }
         catch
         {
-
+            Console.WriteLine($"Error loading template");
         }
     }
 
-    if (containsCount > 1000)
+    if (containsCount > 0)
     {
-        await reso.SavePackage(workspace, $"./tmp/arch/{bucketCount}.resonitepackage", "node-manifest");
+        Console.WriteLine($"Storing bucket {bucketCount}");
+        try
+        {
+            await reso.SavePackage(workspace, $"./tmp/arch/{bucketCount}.resonitepackage", "node-manifest");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving package {ex}");
+        }
 
         workspace.DestroyChildren();
 

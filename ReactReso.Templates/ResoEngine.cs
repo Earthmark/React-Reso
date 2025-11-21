@@ -35,19 +35,6 @@ public class ResoEngine : IDisposable
         Engine = new Engine();
     }
 
-    private class InternalResources : IInternalResource
-    {
-        public Task<System.IO.Stream> ReadBinaryResource(string path)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<string> ReadTextResource(string path)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     private class EngineProgress : IEngineInitProgress
     {
         public int FixedPhaseIndex { get; set; }
@@ -91,7 +78,7 @@ public class ResoEngine : IDisposable
         var progress = new EngineProgress();
 
         var bootstrapper = new ResoEngine();
-        await bootstrapper.Engine.Initialize("./tmp", opts, systemInfo, new InternalResources(), progress);
+        await bootstrapper.Engine.Initialize("./tmp", false, opts, systemInfo, progress);
         return bootstrapper;
     }
 

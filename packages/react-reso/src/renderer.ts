@@ -39,6 +39,7 @@ interface Container extends LogicalInstance {
 
 interface RenderedInstance extends LogicalInstance {
   container: Container;
+  updater: ElementUpdater<any>,
   refs: FieldRefs<any>;
 }
 
@@ -103,7 +104,7 @@ function CreateReconcilerOptions<
 
     prepareUpdate(instance, type, oldProps, newProps) {
       const diffs: Array<PropUpdate> = [];
-      components[type].updater(oldProps, newProps, (p) => diffs.push(p));
+      instance.updater(oldProps, newProps, (p) => diffs.push(p));
       return diffs.length > 0 ? { diffs } : null;
     },
 
