@@ -1,0 +1,24 @@
+module ResetField
+
+in Field: string
+in Type: string
+in Target: Slot element
+
+out this: AsyncImpulse
+
+use Protoflux/FieldTypeSwitch
+
+where {
+    switch Type->FieldTypeSwitch
+        | Ref |> Target->DeleteDynamicVariable<string>(Field)
+        | Bool |> Target->DeleteDynamicVariable<bool>(Field)
+        | String |> Target->DeleteDynamicVariable<string>(Field)
+        | Float |> Target->DeleteDynamicVariable<float>(Field)
+        | Color |> Target->DeleteDynamicVariable<ColorX>(Field)
+        | Float2 |> Target->DeleteDynamicVariable<Float2>(Field)
+        | Float3 |> Target->DeleteDynamicVariable<Float3>(Field)
+        | Float4 |> Target->DeleteDynamicVariable<Float4>(Field)
+        | FloatQ |> Target->DeleteDynamicVariable<FloatQ>(Field)
+        | Uri |> Target->DeleteDynamicVariable<Uri>(Field)
+    ;
+}

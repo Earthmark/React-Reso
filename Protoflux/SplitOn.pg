@@ -1,0 +1,14 @@
+module SplitOn
+
+in Str: string
+in On: string
+
+out Before: string
+out After: string
+
+where {
+    IndexOfSeparator = Str->IndexOfString(On);
+
+    Before = Str->Substring(Length=IndexOfSeparator);
+    After = Str->Substring(IndexOfSeparator + On->StringLength)
+}

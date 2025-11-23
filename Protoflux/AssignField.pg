@@ -1,0 +1,26 @@
+module AssignField
+
+in Field: string
+in Type: string
+in Value: string
+in Target: Slot element
+in Namespace: string
+
+out this: AsyncImpulse
+
+use Protoflux/FieldTypeSwitch
+
+where {
+    switch Type->FieldTypeSwitch
+        | Ref |> Target->WriteOrCreateDynamicObjectVariable(Path=Field, CreateDirectlyOnTarget=true, Value=ConcatenateMultiString(Inputs=[Namespace, "/", Value]))
+        | Bool |> Target->WriteOrCreateDynamicValueVariable(Path=Field, CreateDirectlyOnTarget=true, Value=Value->Parse_Bool.Value)
+        | String |> Target->WriteOrCreateDynamicObjectVariable(Path=Field, CreateDirectlyOnTarget=true, Value=Value->UnescapeUriDataString)
+        | Float |> Target->WriteOrCreateDynamicValueVariable(Path=Field, CreateDirectlyOnTarget=true, Value=Value->Parse_Float.Value)
+        | Color |> Target->WriteOrCreateDynamicValueVariable(Path=Field, CreateDirectlyOnTarget=true, Value=Value->Parse_ColorX.Value)
+        | Float2 |> Target->WriteOrCreateDynamicValueVariable(Path=Field, CreateDirectlyOnTarget=true, Value=Value->Parse_Float2.Value)
+        | Float3 |> Target->WriteOrCreateDynamicValueVariable(Path=Field, CreateDirectlyOnTarget=true, Value=Value->Parse_Float3.Value)
+        | Float4 |> Target->WriteOrCreateDynamicValueVariable(Path=Field, CreateDirectlyOnTarget=true, Value=Value->Parse_Float4.Value)
+        | FloatQ |> Target->WriteOrCreateDynamicValueVariable(Path=Field, CreateDirectlyOnTarget=true, Value=Value->Parse_Float3.Value->FromEuler_floatQ)
+        | Uri |> Target->WriteOrCreateDynamicObjectVariable(Path=Field, CreateDirectlyOnTarget=true, Value=Value->UnescapeUriDataString->StringToAbsoluteURI)
+    ;
+}

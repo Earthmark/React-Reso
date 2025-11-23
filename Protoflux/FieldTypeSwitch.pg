@@ -1,0 +1,22 @@
+module FieldTypeSwitch
+
+in Type: string
+
+in Ref: SyncImpulse
+in Bool: SyncImpulse
+in String: SyncImpulse
+in Float: SyncImpulse
+in Color: SyncImpulse
+in Float2: SyncImpulse
+in Float3: SyncImpulse
+in Float4: SyncImpulse
+in FloatQ: SyncImpulse
+in Uri: SyncImpulse
+
+out this: SyncImpulse
+
+where {
+    Type
+        ->IndexOfFirstObjectMatch(Values=["ref", "bool", "string", "float", "color", "float2", "float3", "float4", "floatQ", "uri"]).Index
+        ->ImpulseMultiplexer(Impulses=[Ref, Bool, String, Float, Color, Float2, Float3, Float4, FloatQ, Uri]);
+}

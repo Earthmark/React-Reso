@@ -614,3 +614,6 @@ $RECYCLE.BIN/
 *.swp
 
 tmp/
+
+# Protograph outputs.
+/Protoflux/*.brson

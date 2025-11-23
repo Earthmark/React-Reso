@@ -1,0 +1,32 @@
+module SplitReader
+
+// Splits a string by delimiters like an iterator.
+// Unlike most iterators, this one emits the first value by default. Calling MoveNext should be done after each value is read.
+
+// While a reader is being executed, the inputs must be stable otherwise it is undefined behavior.
+
+in Input: string
+in Delimiter: string
+
+out Value: string
+out Done: bool
+out Reset: SyncImpulse
+out MoveNext: SyncImpulse
+
+where {
+    local ReadHead: int;
+
+    Reset = ReadHead <- 0;
+
+    NextSymbolIndex = Input->IndexOfString(Part=Delimiter, StartIndex=ReadHead);
+    Value = Input->Substring(StartIndex=ReadHead, Length=NextSymbolIndex-ReadHead);
+
+    Done = ReadHead >= Input->StringLength;
+    MoveNext = if not Done then ReadHead <- (
+        // If there are remaining delimiters
+        if NextSymbolIndex != -1
+        // Walk after next delimiter
+        then (NextSymbolIndex + Delimiter->StringLength)
+        // Set to end of string, marking it as done.
+        else Input->StringLength);
+}

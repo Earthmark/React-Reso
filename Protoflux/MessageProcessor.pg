@@ -1,0 +1,70 @@
+module MessageProcessor
+
+in Message: string
+
+in Templates: Slot element
+in Staging: Slot element
+in Root: Slot element
+
+in Namespace: string
+
+out this: AsyncImpulse
+
+use Protoflux/SplitReader
+use Protoflux/MessageTypeSwitch
+use Protoflux/Create
+use Protoflux/UpdateField
+use Protoflux/SetParent
+use Protoflux/Remove
+
+where {
+    local Id: string;
+
+    MessageReader = Message->SplitReader("+");
+    Reset = MessageReader.Reset;
+    Current = MessageReader.Value;
+    Next = MessageReader.MoveNext;
+    Done = MessageReader.Done;
+
+    // Insert delays so dyn vars have a chance to hook up.
+    DelayTime = 3;
+
+    ReadId = impulse {
+        Next;
+        Id <- ConcatenateMultiString([Namespace, "/", Current]);
+    };
+
+    impulse {
+        Reset;
+        switch MessageTypeSwitch(MessageType = Current)
+        | Create |> impulse {
+            ReadId;
+            Next;
+            Create(Id=Id, ElementType=Current, Templates=Templates, Staging=Staging);
+        }
+        | Remove |>  impulse {
+            DelayUpdates(DelayTime);
+            ReadId;
+            Remove(Id=Id, Root=Root);
+        }
+        | Update |>  impulse {
+            DelayUpdates(DelayTime);
+            ReadId;
+            Next;
+            whileAsync not Done do impulse {
+                UpdateField(Id=Id, UpdateMessage=Current, DataRoot=Root, Namespace=Namespace);
+                Next;
+            }
+        }
+        | SetParent |> impulse {
+            DelayUpdates(DelayTime);
+            ReadId;
+            Next;
+            local ParentId: string;
+            ParentId <- Current;
+            Next;
+            SetParent(Id=Id, Namespace=Namespace, Root=Root, ParentId=ParentId, AfterId=Current);
+        }
+        ;
+    };
+}

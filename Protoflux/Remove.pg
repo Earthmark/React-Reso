@@ -1,0 +1,14 @@
+module Remove
+
+in Id: string
+in Root: Slot element
+
+out this: SyncImpulse
+
+where {
+    ThisStr = ".__this";
+
+    Target = Root->~read<Slot>(ConcatenateString(Id, ThisStr)).Value;
+
+    if Target == Root then Root->DestroySlotChildren else Target->DestroySlot;
+}

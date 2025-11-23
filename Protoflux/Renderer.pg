@@ -1,0 +1,26 @@
+module Renderer
+
+in Socket: WebsocketClient global
+in Templates: Slot element
+in Staging: Slot element
+in Root: Slot element
+in Namespace: string
+
+use Protoflux/MessageProcessor
+
+where {
+
+    switch Socket->WebsocketConnectionEvents
+    | OnConnected |> impulse {
+        Root->DestroySlotChildren;
+        Staging->DestroySlotChildren;
+    };
+
+
+    local Payload: string;
+    switch Socket->WebsocketTextMessageReceiver
+    | OnReceived Ws |> switch StartAsyncTask()
+        | TaskStart |> switch Payload <- Ws.Data
+            | OnWritten |> MessageProcessor(Templates=Templates, Staging=Staging, Root=Root, Namespace=Namespace, Message=Payload)
+
+}

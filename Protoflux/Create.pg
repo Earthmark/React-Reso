@@ -1,0 +1,18 @@
+module Create
+
+in Id: string
+in ElementType: string
+
+in Templates: Slot element
+in Staging: Slot element
+
+out this: SyncImpulse
+
+where {
+    ProxyTag = "react-reso-element-proxy";
+
+    switch Templates->FindChildByName(ElementType)->DuplicateSlot()
+    | Next Dup |> switch Dup.Duplicate->SetParent(Staging)
+        | Next |> Dup.Duplicate->FindChildByTag(ProxyTag)->SetSlotName(Id)
+
+}

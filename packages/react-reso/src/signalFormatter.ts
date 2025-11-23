@@ -34,11 +34,11 @@ function stringifyOutboundSignal(signal: OutboundSignal): string {
       break;
   }
 
-  return parts.join("+");
+  return parts.join("+") + "+";
 }
 
 export function stringifySignalArray(signals: Array<OutboundSignal>): string {
-  return signals.map(stringifyOutboundSignal).join("\n");
+  return signals.map(stringifyOutboundSignal).join("|") + "|";
 }
 export function parseSignal(signal?: string): Array<InboundSignal> | undefined {
   if (signal === undefined) {

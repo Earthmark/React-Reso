@@ -1,0 +1,16 @@
+module MessageTypeSwitch
+
+in MessageType: string
+
+in Create: AsyncImpulse
+in Remove: AsyncImpulse
+in Update: AsyncImpulse
+in SetParent: AsyncImpulse
+
+out this: AsyncImpulse
+
+where {
+    MessageType
+        ->IndexOfFirstObjectMatch(Values=["create", "remove", "update", "setParent"]).Index
+        ->ImpulseMultiplexer(Impulses=[AsyncCallRelay(Create), AsyncCallRelay(Remove), AsyncCallRelay(Update), AsyncCallRelay(SetParent)]);
+}

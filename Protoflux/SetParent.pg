@@ -1,0 +1,27 @@
+module SetParent
+
+in Id: string
+in Namespace: string
+in Root: Slot element
+in ParentId: string
+in AfterId: string
+
+
+out this: SyncImpulse
+
+where {
+    ThisStr = ".__this";
+    ChildStr = ".__children";
+    NullToken = "$";
+
+    Self = Root->~read<Slot>(ConcatenateString(Id, ThisStr)).Value;
+    ParentChildSlot = Root->~read<Slot>(ConcatenateMultiString([Namespace, "/", ObjectRelay<String>(ParentId), ChildStr])).Value;
+    AfterSlot = Root->~read<Slot>(ConcatenateMultiString([Namespace, "/", AfterId, ThisStr])).Value;
+
+    ParseAfter = AfterId != NullToken;
+
+    ValidMessage = Self->NotNull and ParentChildSlot->NotNull and ((not ParseAfter) or AfterSlot->NotNull);
+
+    if ValidMessage then switch Self->SetParent(ParentChildSlot)
+        | Next |> if ParseAfter then Self->SetChildIndex(AfterSlot->IndexOfChild + 1);
+}
