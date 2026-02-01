@@ -12,5 +12,5 @@ out this: AsyncImpulse
 where {
     MessageType
         ->IndexOfFirstObjectMatch(Values=["create", "remove", "update", "setParent"]).Index
-        ->ImpulseMultiplexer(Impulses=[AsyncCallRelay(Create), AsyncCallRelay(Remove), AsyncCallRelay(Update), AsyncCallRelay(SetParent)]);
+        ->ImpulseMultiplexer(Impulses=[Create, Remove, Update, SetParent]);
 }

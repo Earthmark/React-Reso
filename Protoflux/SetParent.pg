@@ -15,7 +15,7 @@ where {
     NullToken = "$";
 
     Self = Root->~read<Slot>(ConcatenateString(Id, ThisStr)).Value;
-    ParentChildSlot = Root->~read<Slot>(ConcatenateMultiString([Namespace, "/", ObjectRelay<String>(ParentId), ChildStr])).Value;
+    ParentChildSlot = Root->~read<Slot>(ConcatenateMultiString([Namespace, "/", ParentId, ChildStr])).Value;
     AfterSlot = Root->~read<Slot>(ConcatenateMultiString([Namespace, "/", AfterId, ThisStr])).Value;
 
     ParseAfter = AfterId != NullToken;

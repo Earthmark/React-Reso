@@ -21,7 +21,7 @@ where {
 
     TargetSlot = DataRoot->~read<Slot>(ConcatenateString(Id, ProxySuffix)).Value;
 
-    FieldPath = ConcatenateMultiString([ObjectRelay<string>(Id), ".", Field]);
+    FieldPath = ConcatenateMultiString([Id, ".", Field]);
 
     impulse {
         local LocArg: string;
@@ -29,7 +29,7 @@ where {
         LocArg <- Arg;
 
         if LocArg != NullSymbol then 
-            AssignField(Field=FieldPath, Type=Type, Target=TargetSlot, Value=ObjectRelay<string>(LocArg), Namespace=Namespace)
+            AssignField(Field=FieldPath, Type=Type, Target=TargetSlot, Value=LocArg, Namespace=Namespace)
         else 
             ResetField(Field=FieldPath, Type=Type, Target=TargetSlot);
     };
